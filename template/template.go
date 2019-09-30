@@ -1,3 +1,5 @@
+//go:generate hcl2-schema -type Provisioner,OnlyExcept
+
 package template
 
 import (

@@ -163,6 +163,9 @@ func main() {
 				case "communicator.Config":
 					// this one is manually set
 					continue
+				case "map[string]interface{}":
+					// this is probably never going to be supported
+					continue
 				case "common.PackerConfig":
 					// this one is deprecated ?
 					continue
