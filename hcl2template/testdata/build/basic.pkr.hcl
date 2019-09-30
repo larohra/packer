@@ -24,24 +24,26 @@ build {
                 0,
                 42,
             ]
-            script = [
+            scripts = [
                 "script-1.sh",
                 "script-2.sh",
             ]
-            override "vmware-iso" {
-                execute_command = "echo 'password' | sudo -S bash {{.Path}}"
-            }
+            // override "vmware-iso" { // TODO(azr): handle common fields
+            //     execute_command = "echo 'password' | sudo -S bash {{.Path}}"
+            // }
         }
 
-        upload "log.go" "/tmp" {
-            timeout = "5s"
+        file {
+            source = "app.tar.gz"
+            destination = "/tmp/app.tar.gz"
+            // timeout = "5s" // TODO(azr): handle common fields
         }
 
     }
 
     post_provision {
         amazon-import {
-            only = ["src.virtualbox-iso.ubuntu-1204"]
+            // only = ["src.virtualbox-iso.ubuntu-1204"] // TODO(azr): handle common fields
             ami_name = "that-ubuntu-1.0"
         }
     }

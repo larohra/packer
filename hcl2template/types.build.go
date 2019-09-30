@@ -47,11 +47,11 @@ func (p *Parser) decodeBuildConfig(block *hcl.Block) (*Build, hcl.Diagnostics) {
 			diags = append(diags, moreDiags...)
 			build.Froms = append(build.Froms, bf)
 		case buildProvisionnersLabel:
-			pg, moreDiags := p.decodeProvisionerGroup(block)
+			pg, moreDiags := p.decodeProvisionerGroup(block, p.ProvisionersSchemas)
 			diags = append(diags, moreDiags...)
 			build.ProvisionerGroups = append(build.ProvisionerGroups, pg)
 		case buildPostProvisionnersLabel:
-			pg, moreDiags := p.decodePostProvisionerGroup(block)
+			pg, moreDiags := p.decodeProvisionerGroup(block, p.PostProvisionersSchemas)
 			diags = append(diags, moreDiags...)
 			build.PostProvisionerGroups = append(build.PostProvisionerGroups, pg)
 		}

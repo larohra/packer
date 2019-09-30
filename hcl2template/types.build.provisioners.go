@@ -3,97 +3,51 @@ package hcl2template
 import (
 	"github.com/hashicorp/hcl2/gohcl"
 	"github.com/hashicorp/hcl2/hcl"
+	"github.com/hashicorp/hcl2/hcldec"
+	"github.com/zclconf/go-cty/cty"
 )
 
 type ProvisionerGroup struct {
 	CommunicatorRef CommunicatorRef
 
-	Provisioners []Provisioner
+	Provisioners []cty.Value
 	HCL2Ref      HCL2Ref
-}
-
-type Provisioner struct {
-	*hcl.Block
-}
-
-var provisionerGroupSchema = hcl.BodySchema{
-	Blocks: []hcl.BlockHeaderSchema{},
-	Attributes: []hcl.AttributeSchema{
-		{"communicator", false},
-	},
 }
 
 // ProvisionerGroups is a slice of provision blocks; which contains
 // provisioners
 type ProvisionerGroups []*ProvisionerGroup
 
-func (p *Parser) decodeProvisionerGroup(block *hcl.Block) (*ProvisionerGroup, hcl.Diagnostics) {
-
+func (p *Parser) decodeProvisionerGroup(block *hcl.Block, provisionerSpecs map[string]hcldec.Spec) (*ProvisionerGroup, hcl.Diagnostics) {
 	var b struct {
-		Communicator string   `hcl:"communicator,attr"`
+		Communicator string   `hcl:"communicator,optional"`
 		Remain       hcl.Body `hcl:",remain"`
 	}
 
-	var diags hcl.Diagnostics
-
-	_ = gohcl.DecodeBody(block.Body, nil, &b)
-	// ignoring diagnostics here as it will require communicator from the
-	// struct
+	diags := gohcl.DecodeBody(block.Body, nil, &b)
 
 	pg := &ProvisionerGroup{}
 	pg.CommunicatorRef = communicatorRefFromString(b.Communicator)
 	pg.HCL2Ref.DeclRange = block.DefRange
-	pg.HCL2Ref.Remain = b.Remain
 
-	s := provisionerGroupSchema
-	s.Attributes = append(s.Attributes, p.ProvisionersSchema.Attributes...)
-	s.Blocks = append(s.Blocks, p.ProvisionersSchema.Blocks...)
-
-	content, moreDiags := pg.HCL2Ref.Remain.Content(&s)
-	diags = append(diags, moreDiags...)
-
-	for _, block := range content.Blocks {
-		p := Provisioner{block}
-		pg.Provisioners = append(pg.Provisioners, p)
+	buildSchema := &hcl.BodySchema{
+		Blocks: []hcl.BlockHeaderSchema{},
+	}
+	for k := range provisionerSpecs {
+		buildSchema.Blocks = append(buildSchema.Blocks, hcl.BlockHeaderSchema{
+			Type: k,
+		})
 	}
 
-	return pg, diags
-}
-
-var postProvisionerGroupSchema = hcl.BodySchema{
-	Blocks: []hcl.BlockHeaderSchema{},
-	Attributes: []hcl.AttributeSchema{
-		{"communicator", false},
-	},
-}
-
-func (p *Parser) decodePostProvisionerGroup(block *hcl.Block) (*ProvisionerGroup, hcl.Diagnostics) {
-
-	var b struct {
-		Communicator string   `hcl:"communicator,attr"`
-		Remain       hcl.Body `hcl:",remain"`
-	}
-
-	var diags hcl.Diagnostics
-
-	_ = gohcl.DecodeBody(block.Body, nil, &b)
-	// ignoring diagnostics here as it will require communicator from the
-	// struct
-
-	pg := &ProvisionerGroup{}
-	pg.CommunicatorRef = communicatorRefFromString(b.Communicator)
-	pg.HCL2Ref.DeclRange = block.DefRange
-	pg.HCL2Ref.Remain = b.Remain
-
-	s := postProvisionerGroupSchema
-	s.Attributes = append(s.Attributes, p.PostProvisionersSchema.Attributes...)
-	s.Blocks = append(s.Blocks, p.PostProvisionersSchema.Blocks...)
-
-	content, moreDiags := pg.HCL2Ref.Remain.Content(&s)
+	content, moreDiags := b.Remain.Content(buildSchema)
 	diags = append(diags, moreDiags...)
-
 	for _, block := range content.Blocks {
-		p := Provisioner{block}
+		provisionerSpec, found := provisionerSpecs[block.Type]
+		if !found {
+			continue
+		}
+		p, moreDiags := hcldec.Decode(block.Body, provisionerSpec, nil)
+		diags = append(diags, moreDiags...)
 		pg.Provisioners = append(pg.Provisioners, p)
 	}
 
@@ -105,13 +59,4 @@ func (pgs ProvisionerGroups) FirstCommunicatorRef() CommunicatorRef {
 		return NoCommunicator
 	}
 	return pgs[0].CommunicatorRef
-}
-
-// FlatProvisioners returns a slice containing all provisioners.
-func (pgs ProvisionerGroups) FlatProvisioners() []Provisioner {
-	res := []Provisioner{}
-	for _, provisionerGroup := range pgs {
-		res = append(res, provisionerGroup.Provisioners...)
-	}
-	return res
 }

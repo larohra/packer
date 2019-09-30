@@ -42,14 +42,14 @@ func (pkrCfg *PackerConfig) ToV1Build() PackerV1Build {
 				continue
 			}
 
-			provisioners := build.ProvisionerGroups.FlatProvisioners()
-			postProcessors := build.PostProvisionerGroups.FlatProvisioners()
+			// provisioners := build.ProvisionerGroups.FlatProvisioners()
+			// postProcessors := build.PostProvisionerGroups.FlatProvisioners()
 
 			_ = from
 			_ = source
 			_ = communicator
-			_ = provisioners
-			_ = postProcessors
+			// _ = provisioners
+			// _ = postProcessors
 		}
 	}
 	return res

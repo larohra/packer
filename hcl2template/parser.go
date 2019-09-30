@@ -30,34 +30,11 @@ var configSchema = &hcl.BodySchema{
 type Parser struct {
 	*hclparse.Parser
 
-	// List of possible provisioners names.
-	ProvisionersSchema *hcl.BodySchema
+	ProvisionersSchemas map[string]hcldec.Spec
 
-	// List of possible post-provisioners names.
-	PostProvisionersSchema *hcl.BodySchema
+	PostProvisionersSchemas map[string]hcldec.Spec
 
 	CommunicatorSchemas map[string]hcldec.Spec
-}
-
-func NewParser(provisioners, postProvisioners map[string]string) *Parser {
-	p := &Parser{
-		Parser: hclparse.NewParser(),
-		ProvisionersSchema: &hcl.BodySchema{
-			Blocks: []hcl.BlockHeaderSchema{},
-		},
-		PostProvisionersSchema: &hcl.BodySchema{
-			Blocks: []hcl.BlockHeaderSchema{},
-		},
-	}
-	for provisioner := range provisioners {
-		p.ProvisionersSchema.Blocks = append(p.ProvisionersSchema.Blocks, hcl.BlockHeaderSchema{Type: provisioner})
-	}
-
-	for pp := range postProvisioners {
-		p.PostProvisionersSchema.Blocks = append(p.PostProvisionersSchema.Blocks, hcl.BlockHeaderSchema{Type: pp})
-	}
-
-	return p
 }
 
 const hcl2FileExt = ".pkr.hcl"

@@ -6,6 +6,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/hashicorp/hcl2/hcl"
+	"github.com/zclconf/go-cty/cty"
 )
 
 func TestParser_Parse(t *testing.T) {
@@ -69,34 +70,17 @@ func TestParser_Parse(t *testing.T) {
 						ProvisionerGroups: ProvisionerGroups{
 							&ProvisionerGroup{
 								CommunicatorRef: CommunicatorRef{"ssh", "vagrant"},
-								Provisioners: []Provisioner{
-									{
-										&hcl.Block{
-											Type: "shell",
-										},
-									},
-									{
-										&hcl.Block{
-											Type: "shell",
-										},
-									},
-									{
-										&hcl.Block{
-											Type:   "upload",
-											Labels: []string{"log.go", "/tmp"},
-										},
-									},
+								Provisioners: []cty.Value{
+									{}, // shell inline
+									{}, // shell complicated
+									{}, // file
 								},
 							},
 						},
 						PostProvisionerGroups: ProvisionerGroups{
 							&ProvisionerGroup{
-								Provisioners: []Provisioner{
-									{
-										&hcl.Block{
-											Type: "amazon-import",
-										},
-									},
+								Provisioners: []cty.Value{
+									{}, // amazon-import
 								},
 							},
 						},
@@ -108,14 +92,9 @@ func TestParser_Parse(t *testing.T) {
 							},
 						},
 						ProvisionerGroups: ProvisionerGroups{
-							{
-								CommunicatorRef: CommunicatorRef{"ssh", "vagrant"},
-								Provisioners: []Provisioner{
-									{
-										&hcl.Block{
-											Type: "shell",
-										},
-									},
+							&ProvisionerGroup{
+								Provisioners: []cty.Value{
+									{}, // shell inline
 								},
 							},
 						},
@@ -131,6 +110,7 @@ func TestParser_Parse(t *testing.T) {
 				t.Errorf("Parser.Parse() unexpected diagnostics. %s", gotDiags)
 			}
 			if diff := cmp.Diff(tt.wantCfg, gotCfg,
+				cmpopts.IgnoreUnexported(cty.Value{}),
 				cmpopts.IgnoreTypes(HCL2Ref{}),
 				cmpopts.IgnoreTypes([]hcl.Range{}),
 				cmpopts.IgnoreTypes(hcl.Range{}),

@@ -3,6 +3,11 @@ package hcl2template
 import (
 	"testing"
 
+	"github.com/hashicorp/packer/provisioner/file"
+	"github.com/hashicorp/packer/provisioner/shell"
+
+	amazon_import "github.com/hashicorp/packer/post-processor/amazon-import"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/hashicorp/hcl2/hcl"
@@ -15,18 +20,16 @@ import (
 func getBasicParser() *Parser {
 	return &Parser{
 		Parser: hclparse.NewParser(),
-		ProvisionersSchema: &hcl.BodySchema{
-			Blocks: []hcl.BlockHeaderSchema{
-				{Type: "shell"},
-				{Type: "upload", LabelNames: []string{"source", "destination"}},
-			}},
-		PostProvisionersSchema: &hcl.BodySchema{
-			Blocks: []hcl.BlockHeaderSchema{
-				{Type: "amazon-import"},
-			}},
+		ProvisionersSchemas: map[string]hcldec.Spec{
+			"shell": hcldec.ObjectSpec((&shell.Config{}).HCL2Spec()),
+			"file":  hcldec.ObjectSpec((&file.Config{}).HCL2Spec()),
+		},
+		PostProvisionersSchemas: map[string]hcldec.Spec{
+			"amazon-import": hcldec.ObjectSpec((&amazon_import.Config{}).HCL2Spec()),
+		},
 		CommunicatorSchemas: map[string]hcldec.Spec{
-			"ssh":   hcldec.ObjectSpec((*communicator.SSH).HCL2Spec(nil)),
-			"winrm": hcldec.ObjectSpec((*communicator.WinRM).HCL2Spec(nil)),
+			"ssh":   hcldec.ObjectSpec((&communicator.SSH{}).HCL2Spec()),
+			"winrm": hcldec.ObjectSpec((&communicator.WinRM{}).HCL2Spec()),
 		},
 	}
 }
@@ -162,34 +165,17 @@ func TestParser_ParseFile(t *testing.T) {
 						ProvisionerGroups: ProvisionerGroups{
 							&ProvisionerGroup{
 								CommunicatorRef: CommunicatorRef{"ssh", "vagrant"},
-								Provisioners: []Provisioner{
-									{
-										&hcl.Block{
-											Type: "shell",
-										},
-									},
-									{
-										&hcl.Block{
-											Type: "shell",
-										},
-									},
-									{
-										&hcl.Block{
-											Type:   "upload",
-											Labels: []string{"log.go", "/tmp"},
-										},
-									},
+								Provisioners: []cty.Value{
+									{}, // shell inline
+									{}, // shell complicated
+									{}, // file
 								},
 							},
 						},
 						PostProvisionerGroups: ProvisionerGroups{
 							&ProvisionerGroup{
-								Provisioners: []Provisioner{
-									{
-										&hcl.Block{
-											Type: "amazon-import",
-										},
-									},
+								Provisioners: []cty.Value{
+									{}, // amazon-import
 								},
 							},
 						},
@@ -201,13 +187,9 @@ func TestParser_ParseFile(t *testing.T) {
 							},
 						},
 						ProvisionerGroups: ProvisionerGroups{
-							{
-								Provisioners: []Provisioner{
-									{
-										&hcl.Block{
-											Type: "shell",
-										},
-									},
+							&ProvisionerGroup{
+								Provisioners: []cty.Value{
+									{}, // shell inline
 								},
 							},
 						},
