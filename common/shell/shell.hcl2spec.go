@@ -9,8 +9,12 @@ import (
 
 func (*Provisioner) HCL2Spec() map[string]hcldec.Spec {
 	s := map[string]hcldec.Spec{
+		"Binary":         &hcldec.AttrSpec{Name: "binary", Type: cty.Bool, Required: false},
 		"ExecuteCommand": &hcldec.AttrSpec{Name: "execute_command", Type: cty.String, Required: false},
+		"Inline":         &hcldec.AttrSpec{Name: "inline", Type: cty.List(cty.String), Required: false},
 		"RemotePath":     &hcldec.AttrSpec{Name: "remote_path", Type: cty.String, Required: false},
+		"Script":         &hcldec.AttrSpec{Name: "script", Type: cty.String, Required: false},
+		"Scripts":        &hcldec.AttrSpec{Name: "scripts", Type: cty.List(cty.String), Required: false},
 		"ValidExitCodes": &hcldec.AttrSpec{Name: "valid_exit_codes", Type: cty.List(cty.Number), Required: false},
 		"Vars":           &hcldec.AttrSpec{Name: "environment_vars", Type: cty.List(cty.String), Required: false},
 	}

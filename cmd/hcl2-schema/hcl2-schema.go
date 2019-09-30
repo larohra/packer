@@ -91,9 +91,6 @@ func main() {
 			sd := StructDef{StructName: t}
 			fields := structDecl.Fields.List
 			for _, field := range fields {
-				if field.Tag == nil {
-					continue
-				}
 
 				fieldType := string(b[field.Type.Pos()-1 : field.Type.End()-1])
 				fieldName := fieldType[strings.Index(fieldType, ".")+1:]
@@ -109,50 +106,58 @@ func main() {
 				}
 				fd := FieldDef{Name: fieldName}
 
-				tag := field.Tag.Value[1:]
-				tag = tag[:len(tag)-1]
-				tags, err := structtag.Parse(tag)
-				if err != nil {
-					log.Fatalf("structtag.Parse(%s): err: %v", field.Tag.Value, err)
-				}
-				mstr, err := tags.Get("mapstructure")
-				if err != nil {
-					continue
+				squash := false
+				accessor := strings.ToLower(fieldName)
+				if field.Tag != nil {
+					tag := field.Tag.Value[1:]
+					tag = tag[:len(tag)-1]
+					tags, err := structtag.Parse(tag)
+					if err != nil {
+						log.Fatalf("structtag.Parse(%s): err: %v", field.Tag.Value, err)
+					}
+					if mstr, err := tags.Get("mapstructure"); err == nil {
+						if len(mstr.Options) > 0 && mstr.Options[0] == "squash" {
+							squash = true
+						}
+						if mstr.Name != "" {
+							accessor = mstr.Name
+						}
+					}
 				}
 
 				switch fieldType {
 				case "[]string":
 					fd.Spec = fmt.Sprintf("%#v", &hcldec.AttrSpec{
-						Name:     mstr.Name,
+						Name:     accessor,
 						Type:     cty.List(cty.String),
 						Required: false,
 					})
 				case "[]int":
 					fd.Spec = fmt.Sprintf("%#v", &hcldec.AttrSpec{
-						Name:     mstr.Name,
+						Name:     accessor,
 						Type:     cty.List(cty.Number),
 						Required: false,
 					})
 				case "[]byte", "string", "time.Duration":
 					fd.Spec = fmt.Sprintf("%#v", &hcldec.AttrSpec{
-						Name:     mstr.Name,
+						Name:     accessor,
 						Type:     cty.String,
 						Required: false,
 					})
 					// fd.Type = "hcl2template.Type" + strings.Title(fieldType)
 				case "int", "int32", "int64", "float":
 					fd.Spec = fmt.Sprintf("%#v", &hcldec.AttrSpec{
-						Name:     mstr.Name,
+						Name:     accessor,
 						Type:     cty.Number,
 						Required: false,
 					})
 				case "bool", "config.Trilean":
 					fd.Spec = fmt.Sprintf("%#v", &hcldec.AttrSpec{
-						Name:     mstr.Name,
+						Name:     accessor,
 						Type:     cty.Bool,
 						Required: false,
 					})
-				case "map[string]string", "[][]string", "TagMap":
+				case "map[*string]*string", "map[string]string", "[][]string", "TagMap":
 					// TODO(azr): implement those
 					continue
 				case "communicator.Config":
@@ -162,14 +167,14 @@ func main() {
 					// this one is deprecated ?
 					continue
 				default: // nested structures
-					if len(mstr.Options) > 0 && mstr.Options[0] == "squash" {
+					if squash {
 						sd.Squashed = append(sd.Squashed, fieldName)
 						continue
 					}
 					sd.Nested = append(sd.Nested, NestedFieldDef{
 						FieldName: fieldName,
 						TypeName:  fieldType,
-						Accessor:  mstr.Name,
+						Accessor:  accessor,
 					})
 					continue
 				}
