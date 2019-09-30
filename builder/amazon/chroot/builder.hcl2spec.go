@@ -9,7 +9,6 @@ import (
 
 func (*Config) HCL2Spec() map[string]hcldec.Spec {
 	s := map[string]hcldec.Spec{
-		"ChrootMounts":              nil, /* TODO */
 		"CommandWrapper":            &hcldec.AttrSpec{Name: "command_wrapper", Type: cty.String, Required: false},
 		"CopyFiles":                 &hcldec.AttrSpec{Name: "copy_files", Type: cty.List(cty.String), Required: false},
 		"DevicePath":                &hcldec.AttrSpec{Name: "device_path", Type: cty.String, Required: false},
@@ -25,12 +24,9 @@ func (*Config) HCL2Spec() map[string]hcldec.Spec {
 		"RootVolumeType":            &hcldec.AttrSpec{Name: "root_volume_type", Type: cty.String, Required: false},
 		"SourceAmi":                 &hcldec.AttrSpec{Name: "source_ami", Type: cty.String, Required: false},
 		"Architecture":              &hcldec.AttrSpec{Name: "ami_architecture", Type: cty.String, Required: false},
-		"ami_block_device_mappings": &hcldec.BlockObjectSpec{TypeName: "BlockDevices", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((*Config)(nil).AMIMappings.HCL2Spec())},
-		"source_ami_filter":         &hcldec.BlockObjectSpec{TypeName: "awscommon.AmiFilterOptions", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((*Config)(nil).SourceAmiFilter.HCL2Spec())},
-		"root_volume_tags":          &hcldec.BlockObjectSpec{TypeName: "awscommon.TagMap", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((*Config)(nil).RootVolumeTags.HCL2Spec())},
-	}
-	for k, v := range (&Config{}).PackerConfig.HCL2Spec() {
-		s[k] = v
+		"ami_block_device_mappings": &hcldec.BlockObjectSpec{TypeName: "BlockDevices", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((&Config{}).AMIMappings.HCL2Spec())},
+		"source_ami_filter":         &hcldec.BlockObjectSpec{TypeName: "awscommon.AmiFilterOptions", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((&Config{}).SourceAmiFilter.HCL2Spec())},
+		"root_volume_tags":          &hcldec.BlockObjectSpec{TypeName: "awscommon.TagMap", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((&Config{}).RootVolumeTags.HCL2Spec())},
 	}
 	for k, v := range (&Config{}).AMIConfig.HCL2Spec() {
 		s[k] = v

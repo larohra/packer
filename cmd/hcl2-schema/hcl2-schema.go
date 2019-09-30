@@ -153,7 +153,14 @@ func main() {
 						Required: false,
 					})
 				case "map[string]string", "[][]string", "TagMap":
-					fd.Spec = "nil /* TODO */"
+					// TODO(azr): implement those
+					continue
+				case "communicator.Config":
+					// this one is manually set
+					continue
+				case "common.PackerConfig":
+					// this one is deprecated ?
+					continue
 				default: // nested structures
 					if len(mstr.Options) > 0 && mstr.Options[0] == "squash" {
 						sd.Squashed = append(sd.Squashed, fieldName)
@@ -169,14 +176,8 @@ func main() {
 
 				sd.Fields = append(sd.Fields, fd)
 			}
-			if len(sd.Fields) == 0 {
-				continue
-			}
 			res = append(res, sd)
 		}
-	}
-	if len(res) == 0 {
-		return
 	}
 
 	output := bytes.NewBuffer(nil)
@@ -249,7 +250,7 @@ func (*{{ .StructName }}) HCL2Spec() map[string]hcldec.Spec {
 		"{{ .Name }}": {{ .Spec }},
 		{{- end }}
 		{{- range .Nested}}
-		"{{ .Accessor }}": &hcldec.BlockObjectSpec{TypeName: "{{ .TypeName }}", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((*{{ $StructName }})(nil).{{ .FieldName }}.HCL2Spec())},
+		"{{ .Accessor }}": &hcldec.BlockObjectSpec{TypeName: "{{ .TypeName }}", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((&{{ $StructName }}{}).{{ .FieldName }}.HCL2Spec())},
 		{{- end }}
 	}
 	{{- range .Squashed }}

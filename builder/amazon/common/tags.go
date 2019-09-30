@@ -1,5 +1,3 @@
-//go:generate hcl2-schema -type TagMap
-
 package common
 
 import (

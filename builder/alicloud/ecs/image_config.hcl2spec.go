@@ -20,3 +20,11 @@ func (*AlicloudDiskDevice) HCL2Spec() map[string]hcldec.Spec {
 	}
 	return s
 }
+
+func (*AlicloudDiskDevices) HCL2Spec() map[string]hcldec.Spec {
+	s := map[string]hcldec.Spec{
+		"system_disk_mapping": &hcldec.BlockObjectSpec{TypeName: "AlicloudDiskDevice", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((&AlicloudDiskDevices{}).ECSSystemDiskMapping.HCL2Spec())},
+		"image_disk_mappings": &hcldec.BlockObjectSpec{TypeName: "[]AlicloudDiskDevice", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((&AlicloudDiskDevices{}).ECSImagesDiskMappings.HCL2Spec())},
+	}
+	return s
+}

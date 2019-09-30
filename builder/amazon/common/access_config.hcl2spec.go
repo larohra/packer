@@ -20,7 +20,7 @@ func (*AccessConfig) HCL2Spec() map[string]hcldec.Spec {
 		"SkipValidation":        &hcldec.AttrSpec{Name: "skip_region_validation", Type: cty.Bool, Required: false},
 		"SkipMetadataApiCheck":  &hcldec.AttrSpec{Name: "skip_metadata_api_check", Type: cty.Bool, Required: false},
 		"Token":                 &hcldec.AttrSpec{Name: "token", Type: cty.String, Required: false},
-		"vault_aws_engine":      &hcldec.BlockObjectSpec{TypeName: "VaultAWSEngineOptions", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((*AccessConfig)(nil).VaultAWSEngine.HCL2Spec())},
+		"vault_aws_engine":      &hcldec.BlockObjectSpec{TypeName: "VaultAWSEngineOptions", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((&AccessConfig{}).VaultAWSEngine.HCL2Spec())},
 	}
 	return s
 }

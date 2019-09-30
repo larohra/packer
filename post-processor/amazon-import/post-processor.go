@@ -1,3 +1,5 @@
+//go:generate hcl2-schema -type Config
+
 package amazonimport
 
 import (

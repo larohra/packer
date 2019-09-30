@@ -32,8 +32,5 @@ func (*RunConfig) HCL2Spec() map[string]hcldec.Spec {
 		"WaitSnapshotReadyTimeout": &hcldec.AttrSpec{Name: "wait_snapshot_ready_timeout", Type: cty.Number, Required: false},
 		"SSHPrivateIp":             &hcldec.AttrSpec{Name: "ssh_private_ip", Type: cty.Bool, Required: false},
 	}
-	for k, v := range (&RunConfig{}).Comm.HCL2Spec() {
-		s[k] = v
-	}
 	return s
 }
