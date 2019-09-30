@@ -157,7 +157,7 @@ func main() {
 						Type:     cty.Bool,
 						Required: false,
 					})
-				case "map[*string]*string", "map[string]string", "[][]string", "TagMap":
+				case "[]*string", "map[*string]*string", "map[string]string", "[][]string", "TagMap":
 					// TODO(azr): implement those
 					continue
 				case "communicator.Config":

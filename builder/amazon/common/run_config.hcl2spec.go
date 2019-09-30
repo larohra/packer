@@ -43,7 +43,6 @@ func (*RunConfig) HCL2Spec() map[string]hcldec.Spec {
 func (*AmiFilterOptions) HCL2Spec() map[string]hcldec.Spec {
 	s := map[string]hcldec.Spec{
 		"MostRecent": &hcldec.AttrSpec{Name: "most_recent", Type: cty.Bool, Required: false},
-		"owners":     &hcldec.BlockObjectSpec{TypeName: "[]*string", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((&AmiFilterOptions{}).Owners.HCL2Spec())},
 	}
 	return s
 }
