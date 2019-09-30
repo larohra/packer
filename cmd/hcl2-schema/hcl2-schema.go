@@ -157,7 +157,13 @@ func main() {
 						Type:     cty.Bool,
 						Required: false,
 					})
-				case "[]*string", "map[*string]*string", "map[string]string", "[][]string", "TagMap":
+				case "map[*string]*string", "map[string]string":
+					fd.Spec = fmt.Sprintf("%#v", &hcldec.BlockAttrsSpec{
+						TypeName:    accessor,
+						ElementType: cty.String,
+						Required:    false,
+					})
+				case "[]*string", "[][]string", "TagMap":
 					// TODO(azr): implement those
 					continue
 				case "communicator.Config":

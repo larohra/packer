@@ -23,6 +23,7 @@ func (*AMIConfig) HCL2Spec() map[string]hcldec.Spec {
 		"AMIForceDeleteSnapshot":  &hcldec.AttrSpec{Name: "force_delete_snapshot", Type: cty.Bool, Required: false},
 		"AMIEncryptBootVolume":    &hcldec.AttrSpec{Name: "encrypt_boot", Type: cty.Bool, Required: false},
 		"AMIKmsKeyId":             &hcldec.AttrSpec{Name: "kms_key_id", Type: cty.String, Required: false},
+		"AMIRegionKMSKeyIDs":      &hcldec.BlockAttrsSpec{TypeName: "region_kms_key_ids", ElementType: cty.String, Required: false},
 		"AMISkipBuildRegion":      &hcldec.AttrSpec{Name: "skip_save_build_region", Type: cty.Bool, Required: false},
 		"SnapshotUsers":           &hcldec.AttrSpec{Name: "snapshot_users", Type: cty.List(cty.String), Required: false},
 		"SnapshotGroups":          &hcldec.AttrSpec{Name: "snapshot_groups", Type: cty.List(cty.String), Required: false},

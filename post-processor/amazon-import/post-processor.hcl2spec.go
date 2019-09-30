@@ -14,6 +14,7 @@ func (*Config) HCL2Spec() map[string]hcldec.Spec {
 		"S3Encryption":    &hcldec.AttrSpec{Name: "s3_encryption", Type: cty.String, Required: false},
 		"S3EncryptionKey": &hcldec.AttrSpec{Name: "s3_encryption_key", Type: cty.String, Required: false},
 		"SkipClean":       &hcldec.AttrSpec{Name: "skip_clean", Type: cty.Bool, Required: false},
+		"Tags":            &hcldec.BlockAttrsSpec{TypeName: "tags", ElementType: cty.String, Required: false},
 		"Name":            &hcldec.AttrSpec{Name: "ami_name", Type: cty.String, Required: false},
 		"Description":     &hcldec.AttrSpec{Name: "ami_description", Type: cty.String, Required: false},
 		"Users":           &hcldec.AttrSpec{Name: "ami_users", Type: cty.List(cty.String), Required: false},
