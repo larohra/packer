@@ -18,7 +18,7 @@ func (*Config) HCL2Spec() map[string]hcldec.Spec {
 		"SkipClean":            &hcldec.AttrSpec{Name: "skip_clean", Type: cty.Bool, Required: false},
 		"ExpectDisconnect":     &hcldec.AttrSpec{Name: "expect_disconnect", Type: cty.Bool, Required: false},
 	}
-	for k, v := range (*Config)(nil).Provisioner.HCL2Spec() {
+	for k, v := range (&Config{}).Provisioner.HCL2Spec() {
 		s[k] = v
 	}
 	return s

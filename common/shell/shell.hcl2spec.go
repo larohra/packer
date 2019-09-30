@@ -14,7 +14,7 @@ func (*Provisioner) HCL2Spec() map[string]hcldec.Spec {
 		"ValidExitCodes": &hcldec.AttrSpec{Name: "valid_exit_codes", Type: cty.List(cty.Number), Required: false},
 		"Vars":           &hcldec.AttrSpec{Name: "environment_vars", Type: cty.List(cty.String), Required: false},
 	}
-	for k, v := range (*Provisioner)(nil).PackerConfig.HCL2Spec() {
+	for k, v := range (&Provisioner{}).PackerConfig.HCL2Spec() {
 		s[k] = v
 	}
 	return s

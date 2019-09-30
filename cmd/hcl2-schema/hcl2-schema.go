@@ -253,7 +253,7 @@ func (*{{ .StructName }}) HCL2Spec() map[string]hcldec.Spec {
 		{{- end }}
 	}
 	{{- range .Squashed }}
-	for k,v := range (*{{ $StructName }})(nil).{{ . }}.HCL2Spec() {
+	for k,v := range (&{{ $StructName }}{}).{{ . }}.HCL2Spec() {
 		s[k] = v
 	}
 	{{- end}}

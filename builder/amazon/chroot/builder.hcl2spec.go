@@ -29,13 +29,13 @@ func (*Config) HCL2Spec() map[string]hcldec.Spec {
 		"source_ami_filter":         &hcldec.BlockObjectSpec{TypeName: "awscommon.AmiFilterOptions", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((*Config)(nil).SourceAmiFilter.HCL2Spec())},
 		"root_volume_tags":          &hcldec.BlockObjectSpec{TypeName: "awscommon.TagMap", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((*Config)(nil).RootVolumeTags.HCL2Spec())},
 	}
-	for k, v := range (*Config)(nil).PackerConfig.HCL2Spec() {
+	for k, v := range (&Config{}).PackerConfig.HCL2Spec() {
 		s[k] = v
 	}
-	for k, v := range (*Config)(nil).AMIConfig.HCL2Spec() {
+	for k, v := range (&Config{}).AMIConfig.HCL2Spec() {
 		s[k] = v
 	}
-	for k, v := range (*Config)(nil).AccessConfig.HCL2Spec() {
+	for k, v := range (&Config{}).AccessConfig.HCL2Spec() {
 		s[k] = v
 	}
 	return s

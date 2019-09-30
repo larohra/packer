@@ -39,7 +39,7 @@ func (*RunConfig) HCL2Spec() map[string]hcldec.Spec {
 		"subnet_filter":                     &hcldec.BlockObjectSpec{TypeName: "SubnetFilterOptions", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((*RunConfig)(nil).SubnetFilter.HCL2Spec())},
 		"vpc_filter":                        &hcldec.BlockObjectSpec{TypeName: "VpcFilterOptions", LabelNames: []string(nil), Nested: hcldec.ObjectSpec((*RunConfig)(nil).VpcFilter.HCL2Spec())},
 	}
-	for k, v := range (*RunConfig)(nil).Comm.HCL2Spec() {
+	for k, v := range (&RunConfig{}).Comm.HCL2Spec() {
 		s[k] = v
 	}
 	return s
